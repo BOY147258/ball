@@ -1,141 +1,291 @@
-/**
- * C投篮训练助手 - 深色运动风格样式
- * 整合自 basketball-shot-tracker
- */
+/* ================================================
+   C投篮训练助手 - HomeCourt 风格样式
+   ================================================ */
 
-/* ==================== 变量定义 ==================== */
-:root {
-    --primary: #FF6B00;
-    --primary-dark: #CC5500;
-    --primary-light: #FF8C33;
-    --secondary: #FFAA00;
-
-    --bg-dark: #1A1A1A;
-    --bg-darker: #0D0D0D;
-    --bg-light: #252525;
-    --bg-surface: #2A2A2A;
-
-    --text-primary: #FFFFFF;
-    --text-secondary: #AAAAAA;
-    --text-muted: #666666;
-
-    --success: #4CAF50;
-    --danger: #E53935;
-    --warning: #FFAA00;
-    --info: #00BCD4;
-
-    --border: #444444;
-    --border-light: #333333;
-
-    --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.7);
-
-    --radius: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
-}
-
-/* ==================== 基础样式 ==================== */
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
-html, body {
-    height: 100%;
-    overflow: hidden;
+:root {
+    --primary: #ff7a00;
+    --primary-dark: #e66d00;
+    --success: #4caf50;
+    --danger: #e53935;
+    --bg-dark: #0f1115;
+    --bg-surface: #161a20;
+    --bg-card: #1c2028;
+    --border: #262b33;
+    --text: #e6e6e6;
+    --text-secondary: #9aa0aa;
+    --text-muted: #6b7280;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-    background: linear-gradient(180deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
-    color: var(--text-primary);
+    background: var(--bg-dark);
+    color: var(--text);
     min-height: 100vh;
-    overflow-x: hidden;
+    line-height: 1.5;
 }
 
-/* ==================== 容器布局 ==================== */
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 16px;
-    height: 100vh;
+/* ================================================
+   顶部导航栏
+   ================================================ */
+.app-header {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    overflow: hidden;
-}
-
-/* ==================== 顶部标题栏 ==================== */
-.header {
-    display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    padding: 12px 20px;
+    padding: 12px 24px;
     background: var(--bg-surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-.header-logo {
+.header-left {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.header-logo .icon {
-    width: 40px;
-    height: 40px;
-    background: var(--primary);
-    border-radius: 10px;
+.logo svg {
+    display: block;
+}
+
+.header-left h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.header-right {
     display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.loading-status {
+    font-size: 13px;
+    color: var(--primary);
+    padding: 6px 12px;
+    background: var(--bg-card);
+    border-radius: 6px;
+}
+
+.loading-status.ready {
+    color: var(--success);
+}
+
+/* ================================================
+   按钮样式
+   ================================================ */
+.btn {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-}
-
-.header h1 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.header-actions {
-    display: flex;
     gap: 8px;
-}
-
-/* ==================== 加载状态栏 ==================== */
-.loading-status-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     padding: 10px 16px;
-    background: var(--bg-surface);
-    border-radius: var(--radius);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-dark);
+}
+
+.btn-secondary {
+    background: var(--bg-card);
+    color: var(--text);
     border: 1px solid var(--border);
-    font-size: 0.9rem;
-    transition: all 0.3s;
 }
 
-.loading-status-bar.hidden {
-    opacity: 0;
-    height: 0;
+.btn-secondary:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-hit {
+    background: var(--success);
+    color: #fff;
+}
+
+.btn-miss {
+    background: var(--danger);
+    color: #fff;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
     padding: 0;
-    margin: 0;
-    overflow: hidden;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.spinner-small {
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 107, 0, 0.2);
+.btn-icon:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ================================================
+   主内容布局
+   ================================================ */
+.app-main {
+    display: flex;
+    gap: 20px;
+    padding: 20px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+    .app-main {
+        flex-direction: column;
+        padding: 16px;
+    }
+}
+
+/* ================================================
+   视频区域
+   ================================================ */
+.video-section {
+    flex: 2;
+    min-width: 0;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.video-wrapper video,
+.video-wrapper #overlayCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-wrapper #overlayCanvas {
+    pointer-events: none;
+}
+
+/* 状态横幅 */
+.status-banner {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    z-index: 10;
+}
+
+/* 投篮指示器 */
+.shot-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 40px;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 16px;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.shot-indicator.show {
+    opacity: 1;
+}
+
+.shot-indicator .icon {
+    font-size: 48px;
+}
+
+.shot-indicator .text {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.shot-indicator.hit {
+    border: 2px solid var(--success);
+}
+
+.shot-indicator.hit .text {
+    color: var(--success);
+}
+
+.shot-indicator.miss {
+    border: 2px solid var(--danger);
+}
+
+.shot-indicator.miss .text {
+    color: var(--danger);
+}
+
+/* 加载状态 */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border);
     border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -145,486 +295,212 @@ body {
     to { transform: rotate(360deg); }
 }
 
-/* ==================== 主内容区域 ==================== */
-.main-content {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 380px;
-    gap: 16px;
-    min-height: 0;
-    overflow: hidden;
-}
-
-/* ==================== 视频区域 ==================== */
-.video-section {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-height: 0;
-}
-
-.video-container {
-    flex: 1;
-    position: relative;
-    background: var(--bg-dark);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    border: 2px solid var(--border);
-    min-height: 0;
-}
-
-.video-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.input-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.overlay-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: auto;
-}
-
-/* 状态横幅 */
-.status-banner {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 20px;
-    background: rgba(0, 0, 0, 0.85);
-    border-radius: 20px;
-    font-size: 0.9rem;
-    color: var(--text-primary);
-    z-index: 10;
-    white-space: nowrap;
-}
-
-.status-banner.active {
-    background: rgba(76, 175, 80, 0.9);
-    color: white;
-}
-
-.status-banner.warning {
-    background: rgba(255, 170, 0, 0.9);
-    color: #000;
-}
-
-.status-banner.error {
-    background: rgba(229, 57, 53, 0.9);
-    color: white;
-}
-
-.status-banner.info {
-    background: rgba(0, 188, 212, 0.9);
-    color: white;
-}
-
-/* 投篮指示器 */
-.shot-indicator {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    padding: 12px 24px;
-    background: rgba(0, 0, 0, 0.9);
-    border-radius: 25px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.3s ease;
-    z-index: 15;
-}
-
-.shot-indicator.show {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.shot-indicator.made {
-    background: rgba(76, 175, 80, 0.9);
-    border: 2px solid var(--success);
-    color: white;
-}
-
-.shot-indicator.miss {
-    background: rgba(229, 57, 53, 0.9);
-    border: 2px solid var(--danger);
-    color: white;
-}
-
-/* FPS显示 */
-.fps-display {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 6px 12px;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
-    font-size: 0.8rem;
+.loading-overlay p {
+    margin-top: 16px;
     color: var(--text-secondary);
-    font-family: monospace;
-    z-index: 10;
 }
 
-/* 球框设置按钮 */
-.hoop-set-btn {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    padding: 10px 16px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.2s;
-}
-
-.hoop-set-btn:hover {
-    background: var(--primary-dark);
-    transform: scale(1.05);
-}
-
-.hoop-set-btn:disabled {
-    background: var(--bg-light);
-    color: var(--text-muted);
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* 摄像头控制栏 */
-.camera-controls {
+/* 控制按钮组 */
+.controls {
     display: flex;
     gap: 10px;
+    margin-top: 16px;
     flex-wrap: wrap;
-    flex-shrink: 0;
 }
 
-.camera-select {
+.select {
     flex: 1;
     min-width: 150px;
     padding: 10px 14px;
-    background: var(--bg-surface);
+    background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text-primary);
-    font-size: 0.9rem;
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
     cursor: pointer;
 }
 
-.camera-select:focus {
+.select:focus {
     outline: none;
     border-color: var(--primary);
 }
 
-/* ==================== 按钮样式 ==================== */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border: none;
-    border-radius: var(--radius);
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    outline: none;
-    text-decoration: none;
+@media (max-width: 640px) {
+    .controls .btn {
+        flex: 1 1 calc(50% - 5px);
+    }
 }
 
-.btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.btn-primary {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-    background: var(--primary-dark);
-}
-
-.btn-secondary {
-    background: var(--bg-light);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-}
-
-.btn-secondary:hover:not(:disabled) {
-    background: var(--bg-surface);
-    border-color: var(--primary);
-}
-
-.btn-success {
-    background: var(--success);
-    color: white;
-}
-
-.btn-danger {
-    background: var(--danger);
-    color: white;
-}
-
-.btn-icon {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border-radius: 10px;
-    background: var(--bg-light);
-    color: var(--text-secondary);
-    border: 1px solid var(--border);
-}
-
-.btn-icon:hover {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
-
-/* ==================== 侧边栏 ==================== */
-.sidebar {
+/* ================================================
+   侧边栏
+   ================================================ */
+.side-panel {
+    flex: 1;
+    min-width: 280px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    overflow-y: auto;
-    padding-right: 4px;
-}
-
-.sidebar::-webkit-scrollbar {
-    width: 4px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-    background: var(--bg-light);
-    border-radius: 2px;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 2px;
+    gap: 16px;
 }
 
 /* 统计卡片 */
 .stats-card {
     background: var(--bg-surface);
-    border-radius: var(--radius-lg);
-    padding: 16px;
+    border-radius: 12px;
+    padding: 20px;
     border: 1px solid var(--border);
-    flex-shrink: 0;
 }
 
-.stats-card h3 {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.stats-card h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text);
 }
 
-.stats-card h4 {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-}
-
-/* 主要统计 */
-.main-stats {
+.stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 14px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
 .stat-box {
-    background: var(--bg-light);
-    border-radius: var(--radius);
-    padding: 14px 10px;
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 16px 12px;
     text-align: center;
-    border: 1px solid var(--border-light);
 }
 
 .stat-value {
-    font-size: 1.8rem;
+    font-size: 28px;
     font-weight: 700;
-    color: var(--primary);
-    line-height: 1.1;
-}
-
-.stat-value.makes {
-    color: var(--success);
-}
-
-.stat-value.accuracy {
-    color: var(--secondary);
+    color: var(--text);
+    line-height: 1.2;
 }
 
 .stat-label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 12px;
+    color: var(--text-secondary);
     margin-top: 4px;
 }
 
-/* 饼图容器 */
+.stat-box.hit .stat-value {
+    color: var(--success);
+}
+
+.stat-box.miss .stat-value {
+    color: var(--danger);
+}
+
+.stat-box.accuracy .stat-value {
+    color: var(--primary);
+}
+
+/* 饼图 */
 #pieChart {
     max-height: 140px;
-    margin: 10px 0;
-}
-
-/* 计时器 */
-.timer-display {
-    background: var(--bg-darker);
-    border-radius: var(--radius);
-    padding: 12px;
-    text-align: center;
-    margin-top: 10px;
-}
-
-.timer-value {
-    font-size: 2rem;
-    font-weight: 700;
-    font-family: 'Courier New', monospace;
-    color: var(--text-primary);
-    letter-spacing: 2px;
-}
-
-.timer-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 4px;
-}
-
-.progress-bar {
-    height: 4px;
-    background: var(--bg-light);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: 10px;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    border-radius: 2px;
-    transition: width 0.3s ease;
 }
 
 /* 投篮记录 */
 .shots-log-card {
-    margin-top: 12px;
-    max-height: 150px;
-    overflow-y: auto;
+    background: var(--bg-surface);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+}
+
+.shots-log-card h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
 }
 
 .shots-log {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .shot-entry {
     display: flex;
     justify-content: space-between;
-    padding: 8px 12px;
-    background: var(--bg-light);
-    border-radius: 6px;
-    font-size: 0.85rem;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--bg-card);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
 }
 
-.shot-entry.hit {
-    border-left: 3px solid var(--success);
+.shot-entry:last-child {
+    margin-bottom: 0;
 }
 
-.shot-entry.miss {
-    border-left: 3px solid var(--danger);
+.shot-entry .time {
+    color: var(--text-secondary);
 }
 
-/* 热力图区域 */
-.heatmap-card {
-    flex: 1;
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
+.shot-entry .result {
+    font-weight: 600;
 }
 
-.heatmap-canvas {
-    flex: 1;
-    background: var(--bg-dark);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    min-height: 150px;
+.shot-entry.hit .result {
+    color: var(--success);
 }
 
-/* 动作按钮 */
+.shot-entry.miss .result {
+    color: var(--danger);
+}
+
+/* 操作按钮 */
 .action-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
     gap: 10px;
 }
 
-.action-btn {
-    padding: 14px;
-    background: var(--bg-light);
-    border: 2px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text-primary);
-    font-size: 0.85rem;
+.action-buttons .btn {
+    flex: 1;
+}
+
+/* ================================================
+   热力图区域
+   ================================================ */
+.court-section {
+    padding: 20px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.court-section h2 {
+    font-size: 16px;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
+    margin-bottom: 16px;
 }
 
-.action-btn:hover {
-    border-color: var(--primary);
-    background: rgba(255, 107, 0, 0.1);
+#courtCanvas {
+    width: 100%;
+    max-width: 900px;
+    height: 400px;
+    background: var(--bg-surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
 }
 
-.action-btn.active {
-    border-color: var(--primary);
-    background: rgba(255, 107, 0, 0.2);
-    color: var(--primary);
+@media (max-width: 768px) {
+    #courtCanvas {
+        height: 280px;
+    }
 }
 
-.action-btn svg {
-    width: 22px;
-    height: 22px;
-}
-
-/* ==================== 模态框 ==================== */
+/* ================================================
+   模态框
+   ================================================ */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -641,11 +517,11 @@ body {
 
 .modal-content {
     background: var(--bg-surface);
-    border-radius: var(--radius-xl);
-    width: 90%;
+    border-radius: 16px;
+    padding: 32px;
     max-width: 400px;
-    padding: 24px;
-    border: 1px solid var(--border);
+    width: 90%;
+    text-align: center;
     transform: scale(0.9);
     transition: transform 0.3s;
 }
@@ -654,205 +530,94 @@ body {
     transform: scale(1);
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+.modal-icon {
+    margin-bottom: 20px;
 }
 
-.modal-header h2 {
-    font-size: 1.2rem;
-    color: var(--text-primary);
+.modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
 }
 
-.modal-close {
-    width: 36px;
-    height: 36px;
-    border: none;
-    background: var(--bg-light);
-    border-radius: 50%;
+.modal-subtitle {
     color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.modal-close:hover {
-    background: var(--danger);
-    color: white;
-}
-
-.modal-body {
-    padding: 8px 0;
+    margin-bottom: 24px;
 }
 
 .modal-buttons {
     display: flex;
     gap: 12px;
-    margin-top: 20px;
 }
 
-/* ==================== 历史记录 ==================== */
-.history-list {
-    max-height: 350px;
-    overflow-y: auto;
+.modal-buttons .btn {
+    flex: 1;
+    padding: 14px 20px;
+    font-size: 16px;
 }
 
-.history-item {
+.modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
-    background: var(--bg-light);
-    border-radius: var(--radius);
-    margin-bottom: 8px;
-    border: 1px solid var(--border-light);
+    margin-bottom: 20px;
 }
 
-.history-date {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
+.modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
 }
 
-.history-stats {
-    display: flex;
-    gap: 14px;
-    align-items: center;
-}
-
-.history-accuracy {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--primary);
-}
-
-.history-shots {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-/* ==================== 加载状态 ==================== */
-.loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s;
-}
-
-.loading-overlay.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(255, 107, 0, 0.2);
-    border-top-color: var(--primary);
+.modal-close {
+    width: 32px;
+    height: 32px;
+    background: var(--bg-card);
+    border: none;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-.loading-text {
-    margin-top: 16px;
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-/* ==================== 响应式布局 ==================== */
-@media (max-width: 1024px) {
-    .main-content {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr auto;
-    }
-
-    .sidebar {
-        flex-direction: row;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding-right: 0;
-        padding-bottom: 8px;
-        gap: 12px;
-    }
-
-    .stats-card {
-        flex-shrink: 0;
-        min-width: 280px;
-        max-width: 320px;
-    }
-
-    .heatmap-card {
-        flex: 1;
-        min-width: 300px;
-    }
+.modal-close:hover {
+    background: var(--danger);
+    color: #fff;
 }
 
-@media (max-width: 768px) {
-    .container {
-        padding: 8px;
-        gap: 8px;
-    }
-
-    .header h1 {
-        font-size: 1.1rem;
-    }
-
-    .header-logo .icon {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-    }
-
-    .main-stats {
-        gap: 6px;
-    }
-
-    .stat-value {
-        font-size: 1.4rem;
-    }
-
-    .stat-box {
-        padding: 10px 6px;
-    }
-
-    .btn {
-        padding: 8px 12px;
-        font-size: 0.85rem;
-    }
-
-    .action-buttons {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.modal-body {
+    text-align: left;
 }
 
-/* ==================== 全屏模式 ==================== */
-:fullscreen .container,
-:-webkit-full-screen .container {
-    padding: 0;
-    max-width: 100%;
+.help-section {
+    margin-bottom: 20px;
 }
 
-:fullscreen .header,
-:-webkit-full-screen .header {
-    display: none;
+.help-section:last-child {
+    margin-bottom: 0;
 }
 
-/* ==================== 工具类 ==================== */
+.help-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.help-section ol,
+.help-section ul {
+    padding-left: 20px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.help-section li {
+    margin-bottom: 6px;
+}
+
+/* ================================================
+   工具类
+   ================================================ */
 .hidden {
     display: none !important;
 }
@@ -861,64 +626,60 @@ body {
     text-align: center;
 }
 
-.text-success {
-    color: var(--success) !important;
+/* ================================================
+   响应式优化
+   ================================================ */
+@media (max-width: 768px) {
+    .app-header {
+        padding: 12px 16px;
+    }
+
+    .header-left h1 {
+        font-size: 16px;
+    }
+
+    .app-main {
+        padding: 16px;
+    }
+
+    .court-section {
+        padding: 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .modal-content {
+        padding: 24px;
+    }
 }
 
-.text-danger {
-    color: var(--danger) !important;
+/* ================================================
+   全屏模式
+   ================================================ */
+:fullscreen .app-header,
+:-webkit-full-screen .app-header {
+    display: none;
 }
 
-.text-warning {
-    color: var(--warning) !important;
+:fullscreen .court-section,
+:-webkit-full-screen .court-section {
+    display: none;
 }
 
-.text-secondary {
-    color: var(--text-secondary) !important;
+/* ================================================
+   动画
+   ================================================ */
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
 }
 
-.text-muted {
-    color: var(--text-muted) !important;
-}
-
-.mt-4 {
-    margin-top: 16px;
-}
-
-.mb-4 {
-    margin-bottom: 16px;
-}
-
-.flex-1 {
-    flex: 1;
-}
-
-/* ==================== 动画 ==================== */
-@keyframes makeAnimation {
-    0% { transform: scale(0.5); opacity: 0; }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes missAnimation {
-    0% { transform: scale(1.5); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.make-flash {
-    animation: makeAnimation 0.5s ease-out;
-}
-
-.miss-flash {
-    animation: missAnimation 0.3s ease-out;
-}
-
-@keyframes countPop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
-}
-
-.count-pop {
-    animation: countPop 0.3s ease-out;
+.bounce {
+    animation: bounce 0.3s ease;
 }
