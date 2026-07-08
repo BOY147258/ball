@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>C投篮训练助手 - AI篮球投篮分析</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1A1A1A">
+    <meta name="description" content="AI篮球投篮训练助手 - 实时检测进球、统计命中率、投篮热力图">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- AI 模型 CDN -->
+    <!-- TensorFlow.js + COCO-SSD (球检测) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+    <!-- MediaPipe Pose (人体姿态检测) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675471989/pose.js" crossorigin="anonymous"></script>
+    <!-- Chart.js (统计图表) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部标题栏 -->
+        <header class="header">
+            <div class="header-logo">
+                <div class="icon">🏀</div>
+                <h1>C投篮训练助手</h1>
+            </div>
+            <div class="header-actions">
+                <button id="fullscreenBtn" class="btn btn-icon" title="全屏">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+                    </svg>
+                </button>
+                <button id="historyBtn" class="btn btn-icon" title="历史记录">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </button>
+                <button id="helpBtn" class="btn btn-icon" title="帮助">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- 加载状态 -->
+        <div id="loadingStatus" class="loading-status-bar">
+            <div class="spinner-small"></div>
+            <span id="statusText">正在加载 AI 模型...</span>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 视频区域 -->
+            <div class="video-section">
+                <div class="video-container">
+                    <div class="video-wrapper">
+                        <video id="video" class="input-video" playsinline autoplay muted></video>
+                        <canvas id="overlayCanvas" class="overlay-canvas"></canvas>
+
+                        <!-- 投篮指示器 -->
+                        <div id="shotIndicator" class="shot-indicator">
+                            <span id="shotIcon"></span>
+                            <span id="shotText"></span>
+                        </div>
+
+                        <!-- FPS显示 -->
+                        <div id="fpsDisplay" class="fps-display">FPS: --</div>
+
+                        <!-- 状态横幅 -->
+                        <div id="statusBanner" class="status-banner">点击下方按钮开启摄像头</div>
+
+                        <!-- 球框设置按钮 -->
+                        <button id="setHoopBtn" class="hoop-set-btn hidden">
+                            🎯 标记篮筐位置
+                        </button>
+
+                        <!-- 加载状态 -->
+                        <div id="loadingOverlay" class="loading-overlay">
+                            <div class="spinner"></div>
+                            <p class="loading-text">准备中...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 摄像头控制 -->
+                <div class="camera-controls">
+                    <button id="cameraBtn" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        开启摄像头
+                    </button>
+                    <select id="cameraSelect" class="camera-select" disabled>
+                        <option value="">选择摄像头</option>
+                    </select>
+                    <button id="switchCameraBtn" class="btn btn-secondary" disabled title="切换摄像头">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 3h5v5M8 3H3v5M3 16v5h5M21 16v5h-5"/>
+                        </svg>
+                    </button>
+                    <label for="fileInput" class="btn btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        上传视频
+                    </label>
+                    <input type="file" id="fileInput" accept="video/*" style="display:none;">
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <!-- 统计卡片 -->
+                <div class="stats-card">
+                    <h3>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                        本次练习
+                    </h3>
+
+                    <!-- 主要统计 -->
+                    <div class="main-stats">
+                        <div class="stat-box">
+                            <div id="statHit" class="stat-value makes">0</div>
+                            <div class="stat-label">命中</div>
+                        </div>
+                        <div class="stat-box">
+                            <div id="statTotal" class="stat-value">0</div>
+                            <div class="stat-label">投篮</div>
+                        </div>
+                        <div class="stat-box">
+                            <div id="statPct" class="stat-value accuracy">0%</div>
+                            <div class="stat-label">命中率</div>
+                        </div>
+                    </div>
+
+                    <!-- 饼图 -->
+                    <canvas id="pieChart" height="140"></canvas>
+
+                    <!-- 计时器 -->
+                    <div class="timer-display">
+                        <div id="timerValue" class="timer-value">00:00</div>
+                        <div class="timer-label">练习时长</div>
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 投篮记录 -->
+                    <div class="shots-log-card">
+                        <h4>📝 投篮记录</h4>
+                        <div id="shotsLog" class="shots-log"></div>
+                    </div>
+                </div>
+
+                <!-- 投篮热力图 -->
+                <div class="stats-card heatmap-card">
+                    <h3>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        投篮热力图
+                    </h3>
+                    <canvas id="courtCanvas" class="heatmap-canvas"></canvas>
+                </div>
+
+                <!-- 动作按钮 -->
+                <div class="stats-card">
+                    <h3>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                        快捷操作
+                    </h3>
+                    <div class="action-buttons">
+                        <button id="startBtn" class="action-btn active">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                            开始练习
+                        </button>
+                        <button id="pauseBtn" class="action-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="6" y="4" width="4" height="16"/>
+                                <rect x="14" y="4" width="4" height="16"/>
+                            </svg>
+                            暂停
+                        </button>
+                        <button id="resetBtn" class="action-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="1 4 1 10 7 10"/>
+                                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                            </svg>
+                            重置
+                        </button>
+                        <button id="exportBtn" class="action-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            导出数据
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 进球确认弹窗 -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🏀 投篮检测</h2>
+                <button class="modal-close" id="closeConfirmModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center text-secondary mb-4">检测到一次投篮，请确认结果：</p>
+            </div>
+            <div class="modal-buttons">
+                <button id="btnConfirmHit" class="btn btn-success" style="flex:1;">
+                    ✓ 命中
+                </button>
+                <button id="btnConfirmMiss" class="btn btn-danger" style="flex:1;">
+                    ✗ 未命中
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史记录模态框 -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 历史记录</h2>
+                <button class="modal-close" data-close="historyModal">&times;</button>
+            </div>
+            <div id="historyList" class="history-list">
+                <p class="text-muted text-center">暂无历史记录</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 帮助模态框 -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>❓ 使用帮助</h2>
+                <button class="modal-close" data-close="helpModal">&times;</button>
+            </div>
+            <div style="color: var(--text-secondary); line-height: 1.8;">
+                <p style="margin-bottom: 12px;"><strong style="color: var(--primary);">使用步骤：</strong></p>
+                <ol style="padding-left: 20px;">
+                    <li>首次使用需加载 AI 模型，请保持网络连接</li>
+                    <li>点击「开启摄像头」或「上传视频」</li>
+                    <li>点击「标记篮筐位置」标记篮筐中心</li>
+                    <li>开始投篮，系统自动检测进球</li>
+                    <li>确认投篮结果（命中/未命中）</li>
+                    <li>查看热力图了解投篮分布</li>
+                </ol>
+                <p style="margin: 16px 0 12px;"><strong style="color: var(--primary);">摄像头设置建议：</strong></p>
+                <ul style="padding-left: 20px;">
+                    <li>角度：从侧面45度角拍摄最佳</li>
+                    <li>距离：距场地3-5米</li>
+                    <li>高度：架设高度约1-1.5米</li>
+                    <li>光线：确保光线充足，避免逆光</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Scripts - 按依赖顺序加载 -->
+    <script src="js/config.js"></script>
+    <script src="js/courtMapper.js"></script>
+    <script src="js/statistics.js"></script>
+    <script src="js/visualization.js"></script>
+    <script src="js/detection.js"></script>
+    <script src="js/shotAnalyzer.js"></script>
+    <script src="js/videoProcessor.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

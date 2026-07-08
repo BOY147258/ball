@@ -1,0 +1,8 @@
+[build]
+  publish = "."
+  command = "" # 无需构建命令，纯静态文件
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

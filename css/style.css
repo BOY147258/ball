@@ -1,0 +1,924 @@
+/**
+ * C投篮训练助手 - 深色运动风格样式
+ * 整合自 basketball-shot-tracker
+ */
+
+/* ==================== 变量定义 ==================== */
+:root {
+    --primary: #FF6B00;
+    --primary-dark: #CC5500;
+    --primary-light: #FF8C33;
+    --secondary: #FFAA00;
+
+    --bg-dark: #1A1A1A;
+    --bg-darker: #0D0D0D;
+    --bg-light: #252525;
+    --bg-surface: #2A2A2A;
+
+    --text-primary: #FFFFFF;
+    --text-secondary: #AAAAAA;
+    --text-muted: #666666;
+
+    --success: #4CAF50;
+    --danger: #E53935;
+    --warning: #FFAA00;
+    --info: #00BCD4;
+
+    --border: #444444;
+    --border-light: #333333;
+
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.7);
+
+    --radius: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+}
+
+/* ==================== 基础样式 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(180deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ==================== 容器布局 ==================== */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+}
+
+/* ==================== 顶部标题栏 ==================== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-logo .icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ==================== 加载状态栏 ==================== */
+.loading-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--bg-surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.loading-status-bar.hidden {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.spinner-small {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 107, 0, 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==================== 主内容区域 ==================== */
+.main-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 16px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* ==================== 视频区域 ==================== */
+.video-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+}
+
+.video-container {
+    flex: 1;
+    position: relative;
+    background: var(--bg-dark);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 2px solid var(--border);
+    min-height: 0;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.input-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.overlay-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+}
+
+/* 状态横幅 */
+.status-banner {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 20px;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.status-banner.active {
+    background: rgba(76, 175, 80, 0.9);
+    color: white;
+}
+
+.status-banner.warning {
+    background: rgba(255, 170, 0, 0.9);
+    color: #000;
+}
+
+.status-banner.error {
+    background: rgba(229, 57, 53, 0.9);
+    color: white;
+}
+
+.status-banner.info {
+    background: rgba(0, 188, 212, 0.9);
+    color: white;
+}
+
+/* 投篮指示器 */
+.shot-indicator {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 12px 24px;
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+    z-index: 15;
+}
+
+.shot-indicator.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.shot-indicator.made {
+    background: rgba(76, 175, 80, 0.9);
+    border: 2px solid var(--success);
+    color: white;
+}
+
+.shot-indicator.miss {
+    background: rgba(229, 57, 53, 0.9);
+    border: 2px solid var(--danger);
+    color: white;
+}
+
+/* FPS显示 */
+.fps-display {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: monospace;
+    z-index: 10;
+}
+
+/* 球框设置按钮 */
+.hoop-set-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s;
+}
+
+.hoop-set-btn:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.hoop-set-btn:disabled {
+    background: var(--bg-light);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 摄像头控制栏 */
+.camera-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.camera-select {
+    flex: 1;
+    min-width: 150px;
+    padding: 10px 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.camera-select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* ==================== 按钮样式 ==================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    text-decoration: none;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-dark);
+}
+
+.btn-secondary {
+    background: var(--bg-light);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--bg-surface);
+    border-color: var(--primary);
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 10px;
+    background: var(--bg-light);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.btn-icon:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* ==================== 侧边栏 ==================== */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: 2px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+/* 统计卡片 */
+.stats-card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.stats-card h3 {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stats-card h4 {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+/* 主要统计 */
+.main-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.stat-box {
+    background: var(--bg-light);
+    border-radius: var(--radius);
+    padding: 14px 10px;
+    text-align: center;
+    border: 1px solid var(--border-light);
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.1;
+}
+
+.stat-value.makes {
+    color: var(--success);
+}
+
+.stat-value.accuracy {
+    color: var(--secondary);
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+/* 饼图容器 */
+#pieChart {
+    max-height: 140px;
+    margin: 10px 0;
+}
+
+/* 计时器 */
+.timer-display {
+    background: var(--bg-darker);
+    border-radius: var(--radius);
+    padding: 12px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.timer-value {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--text-primary);
+    letter-spacing: 2px;
+}
+
+.timer-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.progress-bar {
+    height: 4px;
+    background: var(--bg-light);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/* 投篮记录 */
+.shots-log-card {
+    margin-top: 12px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.shots-log {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.shot-entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--bg-light);
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.shot-entry.hit {
+    border-left: 3px solid var(--success);
+}
+
+.shot-entry.miss {
+    border-left: 3px solid var(--danger);
+}
+
+/* 热力图区域 */
+.heatmap-card {
+    flex: 1;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.heatmap-canvas {
+    flex: 1;
+    background: var(--bg-dark);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    min-height: 150px;
+}
+
+/* 动作按钮 */
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 14px;
+    background: var(--bg-light);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.action-btn:hover {
+    border-color: var(--primary);
+    background: rgba(255, 107, 0, 0.1);
+}
+
+.action-btn.active {
+    border-color: var(--primary);
+    background: rgba(255, 107, 0, 0.2);
+    color: var(--primary);
+}
+
+.action-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* ==================== 模态框 ==================== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--bg-surface);
+    border-radius: var(--radius-xl);
+    width: 90%;
+    max-width: 400px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    transform: scale(0.9);
+    transition: transform 0.3s;
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.modal-header h2 {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--bg-light);
+    border-radius: 50%;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.modal-body {
+    padding: 8px 0;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* ==================== 历史记录 ==================== */
+.history-list {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg-light);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    border: 1px solid var(--border-light);
+}
+
+.history-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.history-stats {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.history-accuracy {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.history-shots {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* ==================== 加载状态 ==================== */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.loading-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 107, 0, 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    margin-top: 16px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* ==================== 响应式布局 ==================== */
+@media (max-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+    }
+
+    .sidebar {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-right: 0;
+        padding-bottom: 8px;
+        gap: 12px;
+    }
+
+    .stats-card {
+        flex-shrink: 0;
+        min-width: 280px;
+        max-width: 320px;
+    }
+
+    .heatmap-card {
+        flex: 1;
+        min-width: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .header h1 {
+        font-size: 1.1rem;
+    }
+
+    .header-logo .icon {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    .main-stats {
+        gap: 6px;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+    }
+
+    .stat-box {
+        padding: 10px 6px;
+    }
+
+    .btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .action-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==================== 全屏模式 ==================== */
+:fullscreen .container,
+:-webkit-full-screen .container {
+    padding: 0;
+    max-width: 100%;
+}
+
+:fullscreen .header,
+:-webkit-full-screen .header {
+    display: none;
+}
+
+/* ==================== 工具类 ==================== */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-success {
+    color: var(--success) !important;
+}
+
+.text-danger {
+    color: var(--danger) !important;
+}
+
+.text-warning {
+    color: var(--warning) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.mt-4 {
+    margin-top: 16px;
+}
+
+.mb-4 {
+    margin-bottom: 16px;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+/* ==================== 动画 ==================== */
+@keyframes makeAnimation {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes missAnimation {
+    0% { transform: scale(1.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.make-flash {
+    animation: makeAnimation 0.5s ease-out;
+}
+
+.miss-flash {
+    animation: missAnimation 0.3s ease-out;
+}
+
+@keyframes countPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.count-pop {
+    animation: countPop 0.3s ease-out;
+}
